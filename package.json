@@ -1,6 +1,11 @@
 {
-  "name": "react-store",
+  "name": "@react/store",
   "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "qDanik <qdanik@yandex.ru>",
+  "license": "ISC",
+  "homepage": "https://github.com/qDanik/-react-store#readme",
   "description": "Store for MVVM react application, only for VM pattern",
   "keywords": [
     "react-store",
@@ -14,14 +19,9 @@
     "type": "git",
     "url": "git+https://github.com/qDanik/-react-store.git"
   },
-  "author": "qDanik <qdanik@yandex.ru>",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/qDanik/-react-store/issues"
   },
-  "homepage": "https://github.com/qDanik/-react-store#readme",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "build:dev": "rollup -c --environment BUILD:development",
     "build:prod": "rollup -c --compact --environment INCLUDE_DEPS,BUILD:production"
