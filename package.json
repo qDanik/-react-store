@@ -1,5 +1,5 @@
 {
-  "name": "@react/store",
+  "name": "@reactt/store",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -48,5 +48,8 @@
     "rollup-plugin-typescript": "1.0.1",
     "typescript": "3.9.5",
     "typescript-eslint-parser": "22.0.0"
+  },
+  "directories": {
+    "example": "examples"
   }
 }
