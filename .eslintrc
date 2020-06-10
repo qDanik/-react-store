@@ -1,0 +1,60 @@
+{
+  "plugins": [ "typescript" ],
+  "extends": [
+    "eslint:recommended",
+    "typescript"
+  ],
+  "env": {
+    "es6": true
+  },
+  "globals": {
+    "window": true
+  },
+  "parserOptions": {
+    "parser": "typescript-eslint-parser",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "legacyDecorators": true,
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
+  "rules": {
+    "@typescript-eslint/interface-name-prefix": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "prefer-const": "error",
+    "no-console": "error",
+    "no-param-reassign": "off",
+    "no-plusplus": "off",
+    "no-unused-expressions": "off",
+    "no-useless-constructor": "off",
+    "max-len": "off",
+    "padded-blocks": ["error", { "blocks": "never", "classes": "always" }],
+    "newline-before-return": "error",
+    "require-await": "error",
+    "linebreak-style": "off",
+    "no-underscore-dangle": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-named-as-default": "off",
+    "object-curly-spacing": ["error", "always"],
+    "object-curly-newline": ["error", {
+      "ObjectExpression": { "multiline": true, "minProperties": 5 },
+      "ObjectPattern": { "multiline": true, "minProperties": 4 },
+      "ImportDeclaration": { "multiline": true, "minProperties": 5 },
+      "ExportDeclaration": { "multiline": true, "minProperties": 4 }
+    }],
+    "require-jsdoc": [  "error", {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": false,
+        "ClassDeclaration": false,
+        "ArrowFunctionExpression": false,
+        "FunctionExpression": false
+      }
+    }
+    ]
+  }
+}

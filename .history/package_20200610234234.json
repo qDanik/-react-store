@@ -1,0 +1,52 @@
+{
+  "name": "react-store",
+  "version": "1.0.0",
+  "description": "Store for MVVM react application, only for VM pattern",
+  "keywords": [
+    "react-store",
+    "store",
+    "ViewModel",
+    "MVVM",
+    "VM",
+    "react-models"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qDanik/-react-store.git"
+  },
+  "author": "qDanik <qdanik@yandex.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qDanik/-react-store/issues"
+  },
+  "homepage": "https://github.com/qDanik/-react-store#readme",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build:dev": "rollup -c --environment BUILD:development",
+    "build:prod": "rollup -c --compact --environment INCLUDE_DEPS,BUILD:production"
+  },
+  "dependencies": {
+    "react": "16.13.1",
+    "@types/react": "16.9.36"
+  },
+  "devDependencies": {
+    "@babel/core": "7.10.2",
+    "@babel/plugin-proposal-class-properties": "7.10.1",
+    "@babel/plugin-proposal-object-rest-spread": "7.10.1",
+    "@babel/preset-env": "7.10.2",
+    "@babel/preset-react": "7.10.1",
+    "@babel/preset-typescript": "7.10.1",
+    "@typescript-eslint/eslint-plugin": "3.2.0",
+    "@typescript-eslint/parser": "3.2.0",
+    "eslint": "7.2.0",
+    "eslint-config-typescript": "3.0.0",
+    "eslint-plugin-typescript": "0.14.0",
+    "rollup": "2.15.0",
+    "rollup-plugin-babel": "4.4.0",
+    "rollup-plugin-dts": "1.4.7",
+    "rollup-plugin-typescript": "1.0.1",
+    "typescript": "3.9.5",
+    "typescript-eslint-parser": "22.0.0"
+  }
+}
