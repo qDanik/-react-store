@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import getStores from '../utils/getStores';
+import getStoresFromFunction from '../utils/getStoresFromFunction';
 import {IUseStores, SubscribeType} from '../interfraces';
 import Store from './store';
 
@@ -18,7 +18,7 @@ const observeUpdate = (instances: Store, callback: SubscribeType): (() => void) 
 }
 
 const useStore: IUseStores = (name: any): any => {
-  const instances = getStores(name);
+  const instances = getStoresFromFunction(name);
   const forceUpdate = useForceUpdate();
   useEffect(() => {
     return observeUpdate(instances, forceUpdate)

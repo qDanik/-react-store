@@ -1,13 +1,6 @@
-import {CreateStore, DefaultStores, IGetStores} from '../interfraces';
-import {useContext} from 'react';
-import StonesContext from '../components/context';
+import {DefaultStores, IGetStoresBase} from '../interfraces';
 
-const getStores: IGetStores = (values: any, stores?: DefaultStores): any => {
-  if(!stores) {
-    const context: CreateStore = useContext(StonesContext);
-    stores = context.getInstances();
-  }
-
+const getStoresBase: IGetStoresBase = (stores: DefaultStores, values: any): any => {
   if (typeof stores === 'undefined') {
     throw Error('Provider should be initialize before getInstances()');
   }
@@ -32,4 +25,4 @@ const getStores: IGetStores = (values: any, stores?: DefaultStores): any => {
   return response;
 };
 
-export default getStores;
+export default getStoresBase;

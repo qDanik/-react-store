@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactElement } from 'react';
 
 declare const stones: unique symbol;
 
@@ -38,24 +38,24 @@ interface IUseStores {
         [P in K]: T[P];
     };
 }
-interface IGetStores {
-    <T extends DefaultStores, K extends StoresNames>(values?: K, stores?: DefaultStores): T[K];
-    <T extends DefaultStores, K extends StoresNames>(values?: K[], stores?: DefaultStores): {
+interface IGetStoresFromComponent {
+    <T extends DefaultStores, K extends StoresNames>(values?: K): T[K];
+    <T extends DefaultStores, K extends StoresNames>(values?: K[]): {
         [P in K]: T[P];
     };
 }
 
-declare const createStore: (initialState: DefaultState, stores: any[]) => CreateStore;
+declare const createStore: (initialState: DefaultState, stores: any[], storeArgs: any[]) => CreateStore;
+
+declare const useStore: IUseStores;
+
+declare const getStoresFromComponent: IGetStoresFromComponent;
 
 interface ProviderProps {
     store: any;
     children: any;
 }
-declare const Provider: (props: ProviderProps) => React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
-
-declare const useStore: IUseStores;
-
-declare const getStores: IGetStores;
+declare const Provider: (props: ProviderProps) => ReactElement;
 
 declare global {
     interface Window {
@@ -63,4 +63,4 @@ declare global {
     }
 }
 
-export { Provider, Store, createStore, getStores, useStore };
+export { Provider, Store, createStore, getStoresFromComponent as getStores, useStore };

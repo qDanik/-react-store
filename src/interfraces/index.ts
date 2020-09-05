@@ -46,10 +46,26 @@ export interface IUseStores {
   };
 }
 
-export interface IGetStores {
+export interface IGetStoresBase {
+  <T extends DefaultStores, K extends StoresNames>(stores: DefaultStores, values?: K): T[K];
+
+  <T extends DefaultStores, K extends StoresNames>(stores: DefaultStores, values?: K[]): {
+    [P in K]: T[P]
+  };
+}
+
+export interface IGetStoresFromFunction {
   <T extends DefaultStores, K extends StoresNames>(values?: K, stores?: DefaultStores): T[K];
 
   <T extends DefaultStores, K extends StoresNames>(values?: K[], stores?: DefaultStores): {
+    [P in K]: T[P]
+  };
+}
+
+export interface IGetStoresFromComponent {
+  <T extends DefaultStores, K extends StoresNames>(values?: K): T[K];
+
+  <T extends DefaultStores, K extends StoresNames>(values?: K[]): {
     [P in K]: T[P]
   };
 }
