@@ -1,8 +1,7 @@
 import React, {useCallback} from 'react';
-import {Store, createStore, Provider, useStore} from '../../src';
+import {createStore, Provider, useStore} from '../../src';
 
-class CounterStore extends Store {
-  storeName = 'counter';
+export class CounterStore {
   count = 0;
 
   increase(): void {
@@ -18,23 +17,16 @@ class CounterStore extends Store {
   }
 }
 
-// !!! Declare 'react-stones' module with controllers
-// import 'react-stones';
-// declare module 'react-stones' {
-//   export interface DefaultStores {
-//     counter: CounterController;
-//   }
-// }
+const store = createStore({}, {
+  counter: new CounterStore(),
+});
 
-interface DefaultStores {
-  counter: CounterStore
-}
+const rootStore = store.getStores;
 
-const store = createStore({}, [CounterStore]);
+type StoreCatalog = ReturnType<typeof rootStore>;
 
 const Counter = () => {
-  // if u declare module, u shouldn pass types to useStore
-  const counter = useStore<any, keyof DefaultStores>('counter');
+  const counter = useStore('file');
   const onIncrease = useCallback(() => counter.increase(), [counter.count]);
   const onDecrease = useCallback(() => counter.decrease(), [counter.count]);
 

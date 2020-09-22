@@ -13,29 +13,18 @@ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}function _typeof(obj) {
-  "@babel/helpers - typeof";
-
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
     };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}var isStore = function isStore(value) {
-  return value && _typeof(value) === 'object' && typeof value.update === 'function' && value.storeName;
-};function set(target, property, value) {
+    return __assign.apply(this, arguments);
+};function get(target, property) {
+  return this[property];
+}function set(target, property, value) {
   this[property] = value;
 
   if (property !== 'update') {
@@ -43,134 +32,37 @@ function __spreadArrays() {
   }
 
   return true;
-}
-
-function get(target, property) {
-  if (isStore(this[property])) {
-    this[property].update = target.update;
-  }
-
-  return this[property];
-}
-
-var handler = {
-  get: get,
-  set: set
-};function Observer(target) {
-  var proxy = {
-    observer: {
-      update: target.update
-    },
-    listener: {}
+}function Observer(target) {
+  var observer = {
+    update: target.update
   };
 
   for (var property in target) {
-    if (target && !target.hasOwnProperty(property)) {
-      continue;
+    if (target.hasOwnProperty(property)) {
+      observer[property] = target[property];
+      var descriptor = Object.getOwnPropertyDescriptor(target, property) || {
+        enumerable: true
+      };
+      Object.defineProperty(target, property, {
+        enumerable: !!descriptor.enumerable,
+        get: get.bind(observer.observer, target, property),
+        set: set.bind(observer.observer, target, property)
+      });
     }
-
-    proxy.observer[property] = target[property];
-    var descriptor = Object.getOwnPropertyDescriptor(target, property) || {
-      enumerable: true
-    };
-
-    if (isStore(target[property])) {
-      target[property] = Observer(target[property]);
-    }
-
-    Object.defineProperty(target, property, {
-      enumerable: !!descriptor.enumerable,
-      get: handler.get.bind(proxy.observer, target, property),
-      set: handler.set.bind(proxy.observer, target, property)
-    });
   }
 
-  proxy.instance = Object.assign(target, proxy.observer);
-  return proxy.instance;
-}var createStore = function createStore(initialState, stores, storeArgs) {
-  var state = {};
-  stores.forEach(function (store) {
-    var instance = new (store.bind.apply(store, __spreadArrays([void 0], storeArgs)))();
-    state[instance.getStoreName()] = Observer(instance);
-  });
-  return {
-    getInstances: function getInstances() {
-      return state;
-    },
-    getState: function getState() {
-      return initialState;
-    }
-  };
-};var Store =
-/** @class */
-function () {
-  function Store() {
-    var _this = this;
-
-    this.storeName = 'default';
-    this.subscribes = [];
-
-    this.update = function () {
-      _this.subscribes.forEach(function (callback) {
-        return callback();
-      });
-    };
-
-    this.subscribe = function (callback) {
-      _this.subscribes.push(callback);
-    };
-
-    this.unsubscribe = function (callback) {
-      _this.subscribes = _this.subscribes.filter(function (subscribe) {
-        return subscribe !== callback;
-      });
-    };
-  }
-
-  Store.prototype.getStoreName = function () {
-    return this.storeName;
-  };
-
-  return Store;
-}();var StonesContext = React.createContext({
-  getInstances: function getInstances() {},
-  getState: function getState() {}
+  return Object.assign(target, observer);
+}var ReactStoreContext = React.createContext({
+  getStores: function getStores() {
+    return [];
+  },
+  getState: function getState() {},
+  useStore: function useStore() {}
 }); // @ts-ignore
 
 if (process.env.NODE_ENV !== 'production') {
-  StonesContext.displayName = 'StoneStore';
-}var getStoresBase = function getStoresBase(stores, values) {
-  if (typeof stores === 'undefined') {
-    throw Error('Provider should be initialize before getInstances()');
-  }
-
-  if (typeof values === 'string') {
-    return stores[values];
-  }
-
-  if (!Array.isArray(values)) {
-    throw Error('getInstances() should receive store name as string or array of string');
-  }
-
-  var response = {};
-
-  for (var instance in stores) {
-    if (!stores.hasOwnProperty(instance) || !values.includes(instance)) {
-      continue;
-    }
-
-    response[instance] = stores[instance];
-  }
-
-  return response;
-};var getStoresFromFunction = function getStoresFromFunction(values, stores) {
-  if (!stores) {
-    var context = React.useContext(StonesContext);
-    stores = context.getInstances();
-  }
-
-  return getStoresBase(stores, values);
-};var useForceUpdate = function useForceUpdate() {
+  ReactStoreContext.displayName = 'ReactStore';
+}var useForceUpdate = function useForceUpdate() {
   var _a = React.useState(0),
       setState = _a[1];
 
@@ -179,87 +71,65 @@ if (process.env.NODE_ENV !== 'production') {
       return tick + 1;
     });
   };
-};
-
-var observeUpdate = function observeUpdate(instances, callback) {
-  instances.subscribe(callback);
-  return function () {
-    instances.unsubscribe(callback);
-  };
-};
-
-var useStore = function useStore(name) {
-  var instances = getStoresFromFunction(name);
+};function getStore(instances) {
+  var context = React.useContext(ReactStoreContext);
   var forceUpdate = useForceUpdate();
   React.useEffect(function () {
-    return observeUpdate(instances, forceUpdate);
-  }, []);
+    var list = Object.values(instances);
+    list.map(function (instance) {
+      return instance.subcribe(forceUpdate);
+    });
+    return function () {
+      list.map(function (instance) {
+        return instance.subcribe(forceUpdate);
+      });
+    };
+  }, [forceUpdate, instances]);
   return instances;
-};var stones = Symbol('stones');var getGlobal = function getGlobal() {
-  var __window = typeof window !== 'undefined' && window;
+}function createStore(initialState, initialStores, storeArgs) {
+  var stores = {};
+  Object.keys(initialStores).forEach(function (key) {
+    var instance = initialStores[key];
+    stores[key] = Observer(instance);
+  });
 
-  var __global = typeof globalThis !== 'undefined' && globalThis;
-
-  return __global || __window;
-};var getGlobalContext = function getGlobalContext() {
-  var state = getGlobal();
-  return state[stones];
-};var getStoresFromComponent = function getStoresFromComponent(values) {
-  var context = getGlobalContext();
-  var stores = context.getInstances();
-  return getStoresBase(stores, values);
-};function hasPropertyOrSetter(target, property) {
-  if (target.hasOwnProperty(property)) {
-    return true;
+  function getState() {
+    return initialState;
   }
 
-  return !target.hasOwnProperty(property) && typeof target[property] !== 'function';
-}
-
-var defineStoreProperties = function defineStoreProperties(store, properties) {
-  for (var property in properties) {
-    if (!properties.hasOwnProperty(property) || !hasPropertyOrSetter(store, property)) {
-      continue;
-    }
-
-    var currentValue = store[property];
-
-    if (isStore(currentValue)) {
-      defineStoreProperties(currentValue, properties[property]);
-
-      if (currentValue.hasOwnProperty('initialize')) {
-        currentValue.initialize();
-      }
-
-      continue;
-    }
-
-    store[property] = properties[property];
+  function getStores() {
+    return stores;
   }
-};
 
-var initialize = function initialize(store) {
-  var stores = store.getInstances();
-  var state = store.getState();
+  var useStore = function useStore(value) {
+    var values = Array.isArray(value) ? value : [value];
+    var instances = values.reduce(function (acc, key) {
+      return __assign(__assign({}, acc), {
+        key: stores[key]
+      });
+    }, {});
+    return getStore(instances);
+  };
 
-  for (var property in state) {
-    if (!state.hasOwnProperty(property) || !stores.hasOwnProperty(property)) {
-      continue;
-    }
-
-    var properties = state[property];
-    var store_1 = stores[property];
-    defineStoreProperties(store_1, properties);
-  }
-};var setGlobalContext = function setGlobalContext(store) {
-  var state = getGlobal();
-  state[stones] = store;
-};var Provider = function Provider(props) {
+  return {
+    getStores: getStores,
+    getState: getState,
+    useStore: useStore
+  };
+}function Provider(props) {
   var store = props.store,
       children = props.children;
-  initialize(store);
-  setGlobalContext(store);
-  return /*#__PURE__*/React__default.createElement(StonesContext.Provider, {
+  return /*#__PURE__*/React__default.createElement(ReactStoreContext.Provider, {
     value: store
   }, children);
-};exports.Provider=Provider;exports.Store=Store;exports.createStore=createStore;exports.getStores=getStoresFromComponent;exports.useStore=useStore;
+}var useStore = function useStore(value) {
+  var context = React.useContext(ReactStoreContext);
+  var stores = context.getStores();
+  var values = Array.isArray(value) ? value : [value];
+  var instances = values.reduce(function (acc, key) {
+    return __assign(__assign({}, acc), {
+      key: stores[key]
+    });
+  }, {});
+  return getStore(instances);
+};exports.Provider=Provider;exports.ReactStoreContext=ReactStoreContext;exports.createStore=createStore;exports.useStore=useStore;

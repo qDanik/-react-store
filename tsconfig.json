@@ -5,6 +5,7 @@
     "lib": ["es2017", "es7", "es6", "dom"],
     "declaration": true,
     "outDir": "dist",
+    "baseUrl": "./src",
     "strict": true,
     "esModuleInterop": true,
     "jsx": "react"
