@@ -1,4 +1,4 @@
-import {Subscribe} from 'core/subscribe';
+import {Subscribe} from '../../core';
 
 export type DefaultStores = {
   [key: string]: any;

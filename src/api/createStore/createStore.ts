@@ -1,17 +1,17 @@
 import {CreateStore, DeclaredStores, DefaultStores, PickStores} from './interfaces';
-import {Observer} from 'core/observer';
-import {Subscribe, SubscribeImpl} from 'core/subscribe';
+import {Observer, SubscribeImpl} from '../../core';
 import {getStore} from '../useStore/getStore';
 
 export function createStore<State, Stores extends DefaultStores, Args extends object>
 (initialState: State, initialStores: Stores, storeArgs?: Args): CreateStore<State, Stores> {
   const stores: DeclaredStores<Stores> = {};
-  const subscribes: Subscribe = new SubscribeImpl();
+  const subscribes: SubscribeImpl = new SubscribeImpl();
 
-  Object.keys(initialStores).forEach(function (key: string): void {
-    const instance = initialStores[key];
+  Object.keys(initialStores).forEach(function (storeName: string): void {
+    const instance = initialStores[storeName];
+    const update = subscribes.getUpdate(storeName);
 
-    stores[key] = Observer(instance, storeArgs);
+    stores[storeName] = Observer(instance, update, storeArgs);
   });
 
   function getState(): State {
@@ -31,7 +31,7 @@ export function createStore<State, Stores extends DefaultStores, Args extends ob
       }
     }
 
-    return getStore<ReturnType<PickStores<Stores>>>(instances);
+    return getStore<ReturnType<PickStores<Stores>>>(instances, subscribes);
   }
 
   return {

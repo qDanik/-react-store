@@ -13,5 +13,5 @@ export const useStore: PickStores<StoreCatalog> = <Stores>(value: any): ReturnTy
     key: stores[key]
   }), {});
 
-  return getStore<ReturnType<PickStores<Stores>>>(instances);
+  return getStore<ReturnType<PickStores<Stores>>>(instances, context.subscribes);
 }

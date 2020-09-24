@@ -1,4 +1,4 @@
 
-export type StoreCatalog = {
+export interface StoreCatalog {
   [key: string]: any;
 }

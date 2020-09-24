@@ -7,6 +7,12 @@ export class SubscribeImpl implements Subscribe {
     return this.subscribes.hasOwnProperty(storeName);
   }
 
+  getUpdate(storeName: string) {
+    return () => {
+      this.update(storeName);
+    }
+  }
+
   update(storeName: string) {
     if (!this.hasStore(storeName)) {
       return;

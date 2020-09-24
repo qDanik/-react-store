@@ -1,3 +1,3 @@
 export * from './handlers';
-export * from './initialize';
+export * from './subscribe';
 export * from './observer';
