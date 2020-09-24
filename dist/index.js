@@ -22,17 +22,74 @@ var __assign = function() {
         return t;
     };
     return __assign.apply(this, arguments);
+};var ReactStoreContext = React.createContext({
+  getStores: function getStores() {
+    return {};
+  },
+  getState: function getState() {
+    return {};
+  },
+  useStore: function useStore() {
+    return {};
+  },
+  subscribes: {}
+}); // @ts-ignore
+
+if (process.env.NODE_ENV !== 'production') {
+  ReactStoreContext.displayName = 'ReactStore';
+}var useForceUpdate = function useForceUpdate() {
+  var _a = React.useState(0),
+      setState = _a[1];
+
+  return function () {
+    return setState(function (tick) {
+      return tick + 1;
+    });
+  };
+};function getStore(instances) {
+  var subscribes = React.useContext(ReactStoreContext).subscribes;
+  var forceUpdate = useForceUpdate();
+  React.useEffect(function () {
+    var list = Object.keys(instances);
+    list.forEach(function (storeName) {
+      return subscribes.subscribe(storeName, forceUpdate);
+    });
+    return function () {
+      list.forEach(function (storeName) {
+        return subscribes.unsubscribe(storeName, forceUpdate);
+      });
+    };
+  }, [forceUpdate, instances]);
+  return instances;
+}var useStore = function useStore(value) {
+  var context = React.useContext(ReactStoreContext);
+  var stores = context.getStores();
+  var values = Array.isArray(value) ? value : [value];
+  var instances = values.reduce(function (acc, key) {
+    return __assign(__assign({}, acc), {
+      key: stores[key]
+    });
+  }, {});
+  return getStore(instances);
+};var connect = function connect(values, Component) {
+  function Connect(props) {
+    var stores = useStore(values);
+    return /*#__PURE__*/React__default.createElement(Component, __assign({}, props, stores));
+  }
+
+  Connect.displayName = "connect(" + Component.name + ")";
+  return Connect;
 };function get(target, property) {
   return this[property];
 }function set(target, property, value) {
   this[property] = value;
 
-  if (property !== 'update') {
+  if (property !== 'update' && !property.startsWith('_') && typeof this[property] !== 'function') {
     target.update();
   }
 
   return true;
-}function Observer(target) {
+}function Observer(target, storeArgs) {
   var observer = {
     update: target.update
   };
@@ -52,42 +109,49 @@ var __assign = function() {
   }
 
   return Object.assign(target, observer);
-}var ReactStoreContext = React.createContext({
-  getStores: function getStores() {
-    return [];
-  },
-  getState: function getState() {},
-  useStore: function useStore() {}
-}); // @ts-ignore
+}var SubscribeImpl =
+/** @class */
+function () {
+  function SubscribeImpl() {
+    this.subscribes = {};
+  }
 
-if (process.env.NODE_ENV !== 'production') {
-  ReactStoreContext.displayName = 'ReactStore';
-}var useForceUpdate = function useForceUpdate() {
-  var _a = React.useState(0),
-      setState = _a[1];
+  SubscribeImpl.prototype.hasStore = function (storeName) {
+    return this.subscribes.hasOwnProperty(storeName);
+  };
 
-  return function () {
-    return setState(function (tick) {
-      return tick + 1;
+  SubscribeImpl.prototype.update = function (storeName) {
+    if (!this.hasStore(storeName)) {
+      return;
+    }
+
+    this.subscribes[storeName].forEach(function (cb) {
+      return cb();
     });
   };
-};function getStore(instances) {
-  var context = React.useContext(ReactStoreContext);
-  var forceUpdate = useForceUpdate();
-  React.useEffect(function () {
-    var list = Object.values(instances);
-    list.map(function (instance) {
-      return instance.subcribe(forceUpdate);
+
+  SubscribeImpl.prototype.subscribe = function (storeName, cb) {
+    if (!this.hasStore(storeName)) {
+      this.subscribes[storeName] = [];
+    }
+
+    this.subscribes[storeName].push(cb);
+  };
+
+  SubscribeImpl.prototype.unsubscribe = function (storeName, cb) {
+    if (!this.hasStore(storeName)) {
+      return;
+    }
+
+    this.subscribes[storeName] = this.subscribes[storeName].filter(function (subscribe) {
+      return subscribe !== cb;
     });
-    return function () {
-      list.map(function (instance) {
-        return instance.subcribe(forceUpdate);
-      });
-    };
-  }, [forceUpdate, instances]);
-  return instances;
-}function createStore(initialState, initialStores, storeArgs) {
+  };
+
+  return SubscribeImpl;
+}();function createStore(initialState, initialStores, storeArgs) {
   var stores = {};
+  var subscribes = new SubscribeImpl();
   Object.keys(initialStores).forEach(function (key) {
     var instance = initialStores[key];
     stores[key] = Observer(instance);
@@ -102,19 +166,25 @@ if (process.env.NODE_ENV !== 'production') {
   }
 
   var useStore = function useStore(value) {
-    var values = Array.isArray(value) ? value : [value];
-    var instances = values.reduce(function (acc, key) {
-      return __assign(__assign({}, acc), {
-        key: stores[key]
-      });
-    }, {});
+    var storeNames = Array.isArray(value) ? value : [value];
+    var instances = {};
+
+    for (var _i = 0, storeNames_1 = storeNames; _i < storeNames_1.length; _i++) {
+      var storeName = storeNames_1[_i];
+
+      if (stores.hasOwnProperty(storeName)) {
+        instances[storeName] = stores[storeName];
+      }
+    }
+
     return getStore(instances);
   };
 
   return {
     getStores: getStores,
     getState: getState,
-    useStore: useStore
+    useStore: useStore,
+    subscribes: subscribes
   };
 }function Provider(props) {
   var store = props.store,
@@ -122,14 +192,4 @@ if (process.env.NODE_ENV !== 'production') {
   return /*#__PURE__*/React__default.createElement(ReactStoreContext.Provider, {
     value: store
   }, children);
-}var useStore = function useStore(value) {
-  var context = React.useContext(ReactStoreContext);
-  var stores = context.getStores();
-  var values = Array.isArray(value) ? value : [value];
-  var instances = values.reduce(function (acc, key) {
-    return __assign(__assign({}, acc), {
-      key: stores[key]
-    });
-  }, {});
-  return getStore(instances);
-};exports.Provider=Provider;exports.ReactStoreContext=ReactStoreContext;exports.createStore=createStore;exports.useStore=useStore;
+}exports.Provider=Provider;exports.ReactStoreContext=ReactStoreContext;exports.connect=connect;exports.createStore=createStore;exports.useStore=useStore;

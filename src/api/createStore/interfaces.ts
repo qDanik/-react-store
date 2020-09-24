@@ -17,5 +17,6 @@ export interface CreateStore<State, Stores> {
 
 export interface PickStores<Stores> {
   <T extends Stores, K extends keyof Stores>(values?: K): T[K];
-  <T extends Stores, K extends keyof Stores>(values?: K[]): Pick<T, K>
+
+  <T extends Stores, K extends keyof Stores>(values?: K[]): Pick<T, K>;
 }

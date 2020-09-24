@@ -1,12 +1,12 @@
 import {createContext} from 'react';
-import {SubscribeImpl} from 'core/subscribe';
+import {Subscribe} from 'core/subscribe';
 import {StoreCatalog} from './useStore';
 
 export const ReactStoreContext = createContext({
   getStores: (): Partial<StoreCatalog> => ({}),
   getState: () => ({}),
   useStore: () => ({}),
-  subscribes: new SubscribeImpl()
+  subscribes: {} as Subscribe
 });
 
 // @ts-ignore

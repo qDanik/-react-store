@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {createStore, Provider, useStore} from '../../src';
+import {connect, createStore, Provider, useStore} from '../../src';
 
 export class CounterStore {
   count = 0;
@@ -26,7 +26,7 @@ const rootStore = store.getStores;
 type StoreCatalog = ReturnType<typeof rootStore>;
 
 const Counter = () => {
-  const counter = useStore('file');
+  const counter = useStore('counter');
   const onIncrease = useCallback(() => counter.increase(), [counter.count]);
   const onDecrease = useCallback(() => counter.decrease(), [counter.count]);
 
@@ -41,6 +41,8 @@ const Counter = () => {
     </div>
   )
 }
+
+const ConnectedCounter = connect<StoreCatalog, keyof StoreCatalog>(['counter'], Counter)
 
 const App = () => (
   <Provider store={store}>

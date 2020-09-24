@@ -1,3 +1,4 @@
+export * from './connect';
 export * from './createStore';
 export * from './provider';
 export * from './useStore';
