@@ -1,9 +1,10 @@
 'use strict';Object.defineProperty(exports,'__esModule',{value:true});function _interopDefault(e){return(e&&(typeof e==='object')&&'default'in e)?e['default']:e}var React=require('react'),React__default=_interopDefault(React);function get(target, property) {
   return this[property];
 }function set(target, property, value) {
+  var isEqual = this[property] === value;
   this[property] = value;
 
-  if (property !== 'update' && !property.startsWith('_') && typeof this[property] !== 'function') {
+  if (property !== 'update' && !isEqual && !property.startsWith('_') && typeof this[property] !== 'function') {
     target.update();
   }
 

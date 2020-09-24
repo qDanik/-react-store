@@ -21,7 +21,6 @@ export class SubscribeImpl implements Subscribe {
     if (!this.hasStore(storeName)) {
       this.subscribes[storeName] = [];
     }
-    console.log(storeName, 'SUBSCRIBE');
     this.subscribes[storeName].push(cb);
   }
 
@@ -29,7 +28,6 @@ export class SubscribeImpl implements Subscribe {
     if (!this.hasStore(storeName)) {
       return;
     }
-    console.log(storeName, 'UNSUBSCRIBE');
 
     this.subscribes[storeName] = this.subscribes[storeName].filter(subscribe => subscribe !== cb);
   }
