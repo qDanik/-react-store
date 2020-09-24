@@ -28,7 +28,10 @@
   },
   "dependencies": {
     "react": "16.13.1",
-    "@types/react": "16.9.36"
+    "@types/react": "16.9.49"
+  },
+  "peerDependencies": {
+    "react": ">=16.13.1"
   },
   "devDependencies": {
     "@babel/core": "7.10.2",

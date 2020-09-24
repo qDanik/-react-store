@@ -2,8 +2,7 @@ import {useEffect} from 'react';
 import {useForceUpdate} from './useForceUpdate';
 import {SubscribeImpl} from '../../core';
 
-
-export function getStore<Instances>(instances: Instances, subscribes: SubscribeImpl): Instances {
+export function subscribeStore<Instances>(instances: any, subscribes: SubscribeImpl): void {
   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
@@ -14,6 +13,4 @@ export function getStore<Instances>(instances: Instances, subscribes: SubscribeI
       list.forEach(storeName => subscribes.unsubscribe(storeName, forceUpdate));
     }
   }, [forceUpdate, instances]);
-
-  return instances;
 }

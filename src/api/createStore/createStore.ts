@@ -1,8 +1,8 @@
-import {CreateStore, DeclaredStores, DefaultStores, PickStores} from './interfaces';
-import {Observer, SubscribeImpl} from '../../core';
-import {getStore} from '../useStore/getStore';
+import {CreateStore, DeclaredStores, DefaultStates, DefaultStores, PickStores} from './interfaces';
+import {watchStore, SubscribeImpl} from '../../core';
+import {subscribeStore} from '../useStore/subscribeStore';
 
-export function createStore<State, Stores extends DefaultStores, Args extends object>
+export function createStore<State extends DefaultStates, Stores extends DefaultStores, Args extends object>
 (initialState: State, initialStores: Stores, storeArgs?: Args): CreateStore<State, Stores> {
   const stores: DeclaredStores<Stores> = {};
   const subscribes: SubscribeImpl = new SubscribeImpl();
@@ -10,8 +10,9 @@ export function createStore<State, Stores extends DefaultStores, Args extends ob
   Object.keys(initialStores).forEach(function (storeName: string): void {
     const instance = initialStores[storeName];
     const update = subscribes.getUpdate(storeName);
+    const initial = initialState[storeName] || {};
 
-    stores[storeName] = Observer(instance, update, storeArgs);
+    stores[storeName] = watchStore(instance, update, initial, storeArgs);
   });
 
   function getState(): State {
@@ -23,21 +24,27 @@ export function createStore<State, Stores extends DefaultStores, Args extends ob
   }
 
   const useStore: PickStores<Stores> = (value: any): ReturnType<PickStores<Stores>> => {
-    const storeNames = Array.isArray(value) ? value : [value];
-    const instances: ReturnType<PickStores<Stores>> = {};
-    for (let storeName of storeNames) {
-      if (stores.hasOwnProperty(storeName)) {
-        instances[storeName] = stores[storeName];
+    let instances: ReturnType<PickStores<Stores>> = {};
+    if (Array.isArray(value)) {
+      for (const storeName of value) {
+        if (stores.hasOwnProperty(storeName)) {
+          instances[storeName] = stores[storeName];
+        }
       }
+    } else {
+      instances = stores[value];
     }
 
-    return getStore<ReturnType<PickStores<Stores>>>(instances, subscribes);
+    const subscribers = Array.isArray(instances) ? instances : [instances];
+    subscribeStore<ReturnType<PickStores<Stores>>>(subscribers, subscribes);
+
+    return instances;
   }
 
   return {
-    getStores,
     getState,
-    useStore,
+    getStores,
     subscribes,
+    useStore,
   };
 }

@@ -1,2 +1,2 @@
 export * from './interfaces';
-export * from './observer';
+export * from './watchStore';

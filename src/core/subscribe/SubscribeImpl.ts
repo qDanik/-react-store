@@ -3,17 +3,38 @@ import {Subscribes, Subscribe} from './interfaces';
 export class SubscribeImpl implements Subscribe {
   private subscribes: Subscribes = {};
 
-  hasStore(storeName: string) {
-    return this.subscribes.hasOwnProperty(storeName);
+  getList(): Subscribes {
+    return this.subscribes;
   }
 
   getUpdate(storeName: string) {
-    return () => {
+    return (): void => {
       this.update(storeName);
     }
   }
 
-  update(storeName: string) {
+  hasStore(storeName: string): boolean {
+    return this.subscribes.hasOwnProperty(storeName);
+  }
+
+  subscribe(storeName: string, cb: () => void): void {
+    if (!this.hasStore(storeName)) {
+      this.subscribes[storeName] = [];
+    }
+    console.log(storeName, 'SUBSCRIBE');
+    this.subscribes[storeName].push(cb);
+  }
+
+  unsubscribe(storeName: string, cb: () => void): void {
+    if (!this.hasStore(storeName)) {
+      return;
+    }
+    console.log(storeName, 'UNSUBSCRIBE');
+
+    this.subscribes[storeName] = this.subscribes[storeName].filter(subscribe => subscribe !== cb);
+  }
+
+  update(storeName: string): void {
     if (!this.hasStore(storeName)) {
       return;
     }
@@ -21,19 +42,4 @@ export class SubscribeImpl implements Subscribe {
     this.subscribes[storeName].forEach(cb => cb());
   }
 
-  subscribe(storeName: string, cb: () => void) {
-    if (!this.hasStore(storeName)) {
-      this.subscribes[storeName] = [];
-    }
-
-    this.subscribes[storeName].push(cb);
-  }
-
-  unsubscribe(storeName: string, cb: () => void) {
-    if (!this.hasStore(storeName)) {
-      return;
-    }
-
-    this.subscribes[storeName] = this.subscribes[storeName].filter(subscribe => subscribe !== cb);
-  }
 }

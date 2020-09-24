@@ -8,15 +8,16 @@ interface ObserverStore extends Object {
     update: () => void;
 }
 
-declare function Observer<Store extends ObserverStore, Args extends object>(target: Store, update: () => void, storeArgs?: Args): Store;
+declare function watchStore<Store extends ObserverStore, Args extends object>(target: Store, update: () => void, initial: any, storeArgs?: Args): Store;
 
 declare function set<Target extends ObserverStore>(this: any, target: Target, property: string, value: any): boolean;
 
 declare abstract class Subscribe {
+    getList(): Subscribes;
     getUpdate(storeName: string): () => void;
-    update(storeName: string): void;
     subscribe(storeName: string, cb: () => void): void;
     unsubscribe(storeName: string, cb: () => void): void;
+    update(storeName: string): void;
 }
 interface Subscribes {
     [key: string]: any[];
@@ -24,13 +25,25 @@ interface Subscribes {
 
 declare class SubscribeImpl implements Subscribe {
     private subscribes;
-    hasStore(storeName: string): boolean;
+    getList(): Subscribes;
     getUpdate(storeName: string): () => void;
-    update(storeName: string): void;
+    hasStore(storeName: string): boolean;
     subscribe(storeName: string, cb: () => void): void;
     unsubscribe(storeName: string, cb: () => void): void;
+    update(storeName: string): void;
 }
 
+interface ConnectStores<Stores> {
+    <T extends Stores, K extends keyof Stores>(values: K[], Component: any): FunctionComponent;
+}
+
+interface StoreCatalog {
+    [key: string]: any;
+}
+
+declare type DefaultStates = {
+    [key: string]: any;
+};
 declare type DefaultStores = {
     [key: string]: any;
 };
@@ -48,17 +61,9 @@ interface PickStores<Stores> {
     <T extends Stores, K extends keyof Stores>(values?: K[]): Pick<T, K>;
 }
 
-declare function createStore<State, Stores extends DefaultStores, Args extends object>(initialState: State, initialStores: Stores, storeArgs?: Args): CreateStore<State, Stores>;
-
-interface StoreCatalog {
-    [key: string]: any;
-}
+declare function createStore<State extends DefaultStates, Stores extends DefaultStores, Args extends object>(initialState: State, initialStores: Stores, storeArgs?: Args): CreateStore<State, Stores>;
 
 declare const useStore: PickStores<StoreCatalog>;
-
-interface ConnectStores<Stores> {
-    <T extends Stores, K extends keyof Stores>(values: K[], Component: FunctionComponent<Pick<T, K>>): FunctionComponent;
-}
 
 declare const connect: ConnectStores<StoreCatalog>;
 
@@ -70,10 +75,10 @@ interface DefaultProps {
 declare function Provider<ProviderProps extends DefaultProps>(props: ProviderProps): ReactElement;
 
 declare const ReactStoreContext: Context<{
-    getStores: () => Partial<StoreCatalog>;
     getState: () => {};
-    useStore: () => {};
+    getStores: () => Partial<StoreCatalog>;
     subscribes: SubscribeImpl;
+    useStore: () => {};
 }>;
 
-export { ConnectStores, CreateStore, DeclaredStores, DefaultProps, DefaultStores, Observer, ObserverStore, PickStores, Provider, ReactStoreContext, StoreCatalog, Subscribe, SubscribeImpl, Subscribes, connect, createStore, get, set, useStore };
+export { ConnectStores, CreateStore, DeclaredStores, DefaultProps, DefaultStates, DefaultStores, ObserverStore, PickStores, Provider, ReactStoreContext, StoreCatalog, Subscribe, SubscribeImpl, Subscribes, connect, createStore, get, set, useStore, watchStore };

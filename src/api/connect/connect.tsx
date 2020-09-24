@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {StoreCatalog, useStore} from '../useStore';
 import {ConnectStores} from './interfaces';
+import {StoreCatalog, useStore} from '../useStore';
 
 export const connect: ConnectStores<StoreCatalog> = (values: any, Component: any): any => {
   function Connect(props: any) {

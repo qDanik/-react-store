@@ -1,17 +1,32 @@
-import {PickStores} from '../createStore';
+import {useContext, useMemo} from 'react';
 import {StoreCatalog} from './interfaces';
-import {useContext} from 'react';
+import {subscribeStore} from './subscribeStore';
 import {ReactStoreContext} from '../constants';
-import {getStore} from './getStore';
+import {PickStores} from '../createStore';
 
 export const useStore: PickStores<StoreCatalog> = <Stores>(value: any): ReturnType<PickStores<Stores>> => {
   const context = useContext(ReactStoreContext);
   const stores = context.getStores();
-  const values = Array.isArray(value) ? value : [value];
-  const instances: ReturnType<PickStores<Stores>> = values.reduce((acc, key) => ({
-    ...acc,
-    key: stores[key]
-  }), {});
 
-  return getStore<ReturnType<PickStores<Stores>>>(instances, context.subscribes);
+  const [instances, subscribers] = useMemo(() => {
+    let instances;
+    if (Array.isArray(value)) {
+      instances = value.reduce((acc, key) => ({
+        ...acc,
+        [key]: stores[key]
+      }), {});
+    } else {
+      instances = stores[value];
+    }
+
+    const subscribers = Array.isArray(instances) ? instances : {
+      [value]: instances
+    };
+
+    return [instances, subscribers]
+  }, [value, stores])
+
+  subscribeStore<ReturnType<PickStores<Stores>>>(subscribers, context.subscribes);
+
+  return instances;
 }

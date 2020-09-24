@@ -1,11 +1,26 @@
 export abstract class Subscribe {
-  getUpdate(storeName: string) {
+  getList(): Subscribes {
+    return {};
+  }
+
+  getUpdate(storeName: string): () => void {
     return (): void => {
+      return;
     }
-  };
-  update(storeName: string) {};
-  subscribe(storeName: string, cb: () => void) {};
-  unsubscribe(storeName: string, cb: () => void) {};
+  }
+
+  subscribe(storeName: string, cb: () => void): void {
+    return;
+  }
+
+  unsubscribe(storeName: string, cb: () => void): void {
+    return;
+  }
+
+  update(storeName: string): void {
+    return;
+  }
+
 }
 
 export interface Subscribes {
