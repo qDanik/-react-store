@@ -65,7 +65,6 @@ function () {
       this.subscribes[storeName] = [];
     }
 
-    console.log(storeName, 'SUBSCRIBE');
     this.subscribes[storeName].push(cb);
   };
 
@@ -74,7 +73,6 @@ function () {
       return;
     }
 
-    console.log(storeName, 'UNSUBSCRIBE');
     this.subscribes[storeName] = this.subscribes[storeName].filter(function (subscribe) {
       return subscribe !== cb;
     });
